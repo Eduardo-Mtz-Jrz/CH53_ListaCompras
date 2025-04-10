@@ -15,6 +15,8 @@ let cont = 0;
 // Contador para la columna de resumen
 let costoTotal = 0;
 let totalEnProductos = 0;
+// Arreglo para almacenar los elementos de la tabla
+let datos = new Array(); 
 
 function validarCantidad(){
     // length < 0 - Valida que no este vacio 
@@ -84,6 +86,21 @@ btnAgregar.addEventListener("click", function(event){
                         <td>${precio}</td>
                     </tr>`;
         cuerpoTabla.insertAdjacentHTML("beforeend", row);
+
+        // Creación del objeto con los elementos de la tabla
+        let elemento = {
+                        "cont" : cont,
+                        "nombre" : txtName.value,
+                        "cantidad" : txtNumber.value,
+                        "precio" : precio
+                    };
+        // Se guardan los objetos en el arreglo
+        datos.push(elemento);
+
+        // Se guarda la información de forma local para accdecer a ella 
+        localStorage.setItem("datos", JSON.stringify(datos));
+
+        // Resumen
         // Total de cantidad de productos 
         costoTotal += precio * Number(txtNumber.value);
         precioTotal.innerText = "$" + costoTotal.toFixed(2);
@@ -93,10 +110,57 @@ btnAgregar.addEventListener("click", function(event){
         // Conteo total de diferentes productos
         contadorProductos.innerText = cont; // Se reutiliza el contador de columna
 
+        // Se crea objeto de resumen para no perder la información al salir
+        // Se hace despues del bloque anterior para que se actualice 
+        let resumen = {
+                        "cont" : cont,
+                        "totalEnProductos" : totalEnProductos,
+                        "costoTotal" : costoTotal
+                    };
+
+        // No se crea un arreglo como en datos
+        localStorage.setItem("resumen", JSON.stringify(resumen));
+
+        // "Limpia" la pantalla al agregar el producto 
+        // Regresa automaticamente al campo de nombre
         txtName.value = "";
         txtNumber.value = "";
         txtName.focus();
     } // if isValid
 
-
 }); // btnAgregar
+
+// Cuando regresemos/cargue la pagina regresen los datos del localStorage 
+window.addEventListener("load", function(event){
+    event.preventDefault();
+
+    // Validar que no haya datos guardados
+    if (this.localStorage.getItem("datos") != null) {
+        datos = JSON.parse(this.localStorage.getItem("datos"));
+    }
+
+    // Acomodar los datos en la tabla
+    datos.forEach((d) => {
+        let row = `<tr>
+                    <td>${d.cont}</td>
+                    <td>${d.nombre}</td>
+                    <td>${d.cantidad}</td>
+                    <td>${d.precio}</td>
+                   </tr>`;
+        cuerpoTabla.insertAdjacentHTML("beforeend", row);
+    });
+
+    if (this.localStorage.getItem("resumen") != null) {
+        let resumen = JSON.parse(this.localStorage.getItem("resumen"));
+        // Guardar los datos obtenidos
+        costoTotal = resumen.costoTotal;
+        totalEnProductos = resumen.totalEnProductos;
+        cont = resumen.cont;
+    }
+
+    // Mostrar dichos datos obtenidos
+    precioTotal.innerText = "$" + costoTotal.toFixed(2);
+    productosTotal.innerText = totalEnProductos;
+    contadorProductos.innerText = cont;
+    
+})
