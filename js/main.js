@@ -67,12 +67,14 @@ btnAgregar.addEventListener("click", function(event){
         txtName.style.border = "solid medium red"; // Estilo del bloque de alerta
         alertValidacionesTexto.innerHTML = "<strong>El Nombre del producto no es correcto.</strong>"; // Mensaje de alerta
         alertValidaciones.style.display = "block"; // El bloque de alerta se muestra en bloque
+        isValid = false;
     }
 
     if (! validarCantidad()) { 
         txtNumber.style.border = "solid medium red"; 
         alertValidacionesTexto.innerHTML += "<br/><strong>La cantidad no es correcta.</strong>"; 
         alertValidaciones.style.display = "block";
+        isValid = false;
     }
 
     // Si paso las validaciones
@@ -164,3 +166,30 @@ window.addEventListener("load", function(event){
     contadorProductos.innerText = cont;
     
 })
+
+// Agregar la funcionalidad del boton Limpiar Todo
+// Resumen
+// Tabla
+// Campos
+// Alerta
+
+// Borrar Todo
+const btnClear = document.getElementById("btnClear");
+
+btnClear.addEventListener("click", function(event) {
+    event.preventDefault();
+    let isValid = true;
+    alertValidacionesTexto.innerHTML = ""; 
+    alertValidaciones.style.display = "none"; 
+    txtName.style.border = "";
+    txtNumber.style.border = "";
+    txtName.value = "";
+    txtNumber.value = "";
+    cuerpoTabla.innerHTML = "";
+    precioTotal.innerText = "";
+    productosTotal.innerText = "";
+    contadorProductos.innerText = "";
+    cont = 0;
+    localStorage.removeItem("datos");
+    localStorage.removeItem("resumen");
+});
